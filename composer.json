@@ -16,5 +16,7 @@
 			"name": "moocky",
 			"email": "moocky@moocky.net"
 		}
-	]
+	],
+	"prefer-stable": true,
+	"minimum-stability": "dev",
 }
