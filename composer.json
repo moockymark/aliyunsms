@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
 	"name": "moocky/aliyunsms",
 	"description": "基于alibabacloud/dysmsapi-20180501接入laravel",
 	"type": "library",
@@ -17,4 +18,23 @@
 			"email": "moocky@moocky.net"
 		}
 	]
+=======
+    "name": "moocky/aliyunsms",
+    "description": "基于alibabacloud/dysmsapi-20180501接入laravel",
+    "type": "library",
+    "require": {
+        "alibabacloud/dysmsapi-20180501": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Moocky\\Aliyunsms\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "moocky",
+            "email": "moocky@moocky.net"
+        }
+    ]
+>>>>>>> ec96575ae60cfb29a64bde323a02912beb1bd4b4
 }
