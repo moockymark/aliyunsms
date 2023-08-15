@@ -1,9 +1,9 @@
 # aliyunsms
-基于阿里云 SDK alibabacloud/dysmsapi-20170525接入短信服务
+基于laravel框架的 阿里云 SDK alibabacloud/dysmsapi-20180501接入短信服务
 
 # 安装
 
-composer require moocky/aliyunsms
+composer require moocky/aliyunsms dev-master
 
 # 基于laravel框架的使用方法
 
@@ -16,13 +16,14 @@ php artisan vendor:publish --provider=Moocky\Aliyunsms\LaravelServiceProvider
 
 ## 配置
 根据新增的aliyunsms.php 文件，在.env文件中添加环境变量：
-
+```INI
 ALIYUN_ACCESS_KEY_ID=your access key
 ALIYUN_ACCESS_KEY_SECRET=your access secret
 ALIYUN_DYSMS_ENDPOINT=endpoint         # 短信发送节点，没有配置时为dysmsapi.aliyuncs.com
 ALIYUN_DYSMS_SIGN_NAME=your sign name  # 短信签名，必须配置
 ALIYUN_DYSMS_VERIFICATION_TEMPLATE=verification template code # 验证码模板代码，不发送验证可不配置
 ALIYUN_DYSMS_SMS_LOG_TABLE=sms_log     # 短信日志表名称
+```
 
 ## 创建短信日志表
 php artisan aliyunsms:table
