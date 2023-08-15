@@ -1,5 +1,5 @@
 # aliyunsms
-基于laravel框架的 阿里云 SDK alibabacloud/dysmsapi-20180501接入短信服务
+基于laravel框架的 阿里云 SDK alibabacloud/dysmsapi-20170525 接入短信服务
 
 # 安装
 

@@ -1,6 +1,6 @@
 {
 	"name": "moocky/aliyunsms",
-	"description": "基于alibabacloud/dysmsapi-20180501接入laravel",
+	"description": "基于alibabacloud/dysmsapi-20170525 接入短信服务",
 	"type": "library",
 	"require": {
 		"php": ">5.5",
