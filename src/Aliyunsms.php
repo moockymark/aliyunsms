@@ -18,12 +18,13 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
 use Moocky\Aliyunsms\Models\SmsLog;
+use Moocky\Aliyunsms\Contracts\Aliyunsms as AliyunsmsContract;
 
-class Aliyunsms
+class Aliyunsms extends AliyunsmsContract
 {
 	protected $config;
 
-	public function __construct($config)
+	public function __construct(?array $config = [])
 	{
 		$this->config = $config;
 	}

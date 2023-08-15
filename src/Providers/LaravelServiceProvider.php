@@ -9,6 +9,7 @@ namespace Moocky\Aliyunsms\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Moocky\Aliyunsms\Aliyunsms;
+use Moocky\Aliyunsms\Contracts\Aliyunsms as AliyunsmsContract;
 
 class LaravelServiceProvider extends ServiceProvider
 {
@@ -24,6 +25,10 @@ class LaravelServiceProvider extends ServiceProvider
 		$path = realpath(__DIR__ . '/../../config/aliyunsms.php');
     $this->publishes([ $path => config_path('aliyunsms.php')],'config');
     $this->mergeConfigFrom($path, 'aliyunsms');
+
+    $this->commands([
+      \Moocky\Aliyunsms\Console\TableCommand::class
+    ]);
 	}
 
 	public function register()
@@ -32,6 +37,10 @@ class LaravelServiceProvider extends ServiceProvider
 		$this->app->singleton('aliyunsms', function ($app) {
 			return new Aliyunsms($app->config['aliyunsms']);
 		});
+    //使用bind绑定实例到接口以便依赖注入
+    $this->app->bind(AliyunsmsContract::class,function(){
+      return new TestService();
+    });
 	}
 
 	/**
