@@ -1,9 +1,10 @@
 # aliyunsms
-基于laravel框架的 阿里云 SDK alibabacloud/dysmsapi-20170525 接入短信服务
+基于阿里云 SDK alibabacloud/dysmsapi-20170525 接入短信服务
 
 # 安装
-
+```BASH
 composer require moocky/aliyunsms dev-master
+```
 
 # 基于laravel框架的使用方法
 
@@ -11,8 +12,9 @@ composer require moocky/aliyunsms dev-master
 在config/app的providers中添加 Moocky\Aliyunsms\LaravelServiceProvider::class
 
 ## 控制台运行
-
+```BASH
 php artisan vendor:publish --provider=Moocky\Aliyunsms\LaravelServiceProvider
+```
 
 ## 配置
 根据新增的aliyunsms.php 文件，在.env文件中添加环境变量：
@@ -26,9 +28,10 @@ ALIYUN_DYSMS_SMS_LOG_TABLE=sms_log     # 短信日志表名称
 ```
 
 ## 创建短信日志表
+```BASH
 php artisan aliyunsms:table
 php artisan migrate:install
-
+```
 ## 使用
 ```PHP
 namespace App\Http\Controllers;
