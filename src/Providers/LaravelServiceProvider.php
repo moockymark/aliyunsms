@@ -39,7 +39,7 @@ class LaravelServiceProvider extends ServiceProvider
 		});
     //使用bind绑定实例到接口以便依赖注入
     $this->app->bind(AliyunsmsContract::class,function(){
-      return new TestService();
+			return new Aliyunsms($app->config['aliyunsms']);
     });
 	}
 
