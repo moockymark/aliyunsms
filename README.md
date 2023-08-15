@@ -1,9 +1,9 @@
 # aliyunsms
-基于laravel框架的 阿里云 SDK alibabacloud/dysmsapi-20180501接入短信服务
+基于阿里云 SDK alibabacloud/dysmsapi-20170525接入短信服务
 
 # 安装
 
-composer require moocky/aliyunsms dev-master
+composer require moocky/aliyunsms
 
 # 基于laravel框架的使用方法
 
