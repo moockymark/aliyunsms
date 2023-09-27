@@ -30,5 +30,5 @@ class SmsLog extends Model
    *
    * @var array
    */
-  protected $fillable = ['id','phone','sign_name','template_code','template_param','type','code','biz_id','request_id'];
+  protected $fillable = ['id','phone','sign_name','template_code','template_param','type','verified','code','biz_id','request_id'];
 }

@@ -17,11 +17,22 @@ use AlibabaCloud\Tea\Utils\Utils\RuntimeOptions;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
-use Moocky\Aliyunsms\Models\SmsLog;
 use Moocky\Aliyunsms\Contracts\Aliyunsms as AliyunsmsContract;
+use Moocky\Aliyunsms\Models\SmsLog;
+use Moocky\Aliyunsms\ResultData;
 
 class Aliyunsms extends AliyunsmsContract
 {
+  /**
+   * @var array [
+   *   'access_key_id' => string,
+   *   'access_key_secret' => string,
+   *   'endpoint' => string,
+   *   'sign_name' => string,
+   *   'sms_log_table' => string,
+   *   'template_code' => string,
+   * ]
+   */
 	protected $config;
 
 	public function __construct(?array $config = [])
@@ -72,11 +83,46 @@ class Aliyunsms extends AliyunsmsContract
    */
   private function model()
   {
-    $model = new SmsLog;
     if($this->config['sms_log_table']){
+      $model = new SmsLog;
       $model->setTable($this->config['sms_log_table']);
+      return $model;
     }
-    return $model;
+  }
+  /**
+   * 记录日志
+   * @param string $phone 手机号码
+   * @param string $templateCode 模板名称
+   * @param array $templateParam 内容参数
+   * @param string $type 短信类型
+   * @param \Moocky\Aliyunsms\ResultData $result 阿里云响应
+   * @return Moocky\Aliyunsms\Models\SmsLog
+   */
+  private function log(string $phone, string $templateCode, ?array $templateParam = null, string $type, ResultData $result){
+    if($model = $this->model()){
+      return $model->create([
+        'sign_name' => $this->config['sign_name'],
+        'phone' => $phone,
+        'template_code' => $templateCode,
+        'template_param' => $templateParam,
+        'type' => $type,
+        'code' => $result->code,
+        'message' => $result->message,
+        'biz_id' => $result->bizId,
+        'request_id' => $result->requestId
+      ]);
+    }
+  }
+  /**
+   * 获取日志
+   * @param string $phone 手机号码
+   * @param string $type 短信类型
+   * @return Moocky\Aliyunsms\Models\SmsLog
+   */
+  private function info(string $phone,?string $type = 'normal'){
+    if($model = $this->model()){
+      return $model->where('phone',$phone)->where('type',$type)->where('code','like','OK')->latest()->first();
+    }
   }
   /**
    * 发送验证码
@@ -86,52 +132,39 @@ class Aliyunsms extends AliyunsmsContract
    * @param array $templateParam 短信参数
    * @param string $type 短信类型
    * 
-   * @return int
-   *   true 发送成功
-   *   false 发送失败
-   *   -1 30秒内已经有验证码
+   * @return \Moocky\Aliyunsms\ResultData
    */
-	public function send(string $phone, string $templateCode, $templateParam = null , ?string $type = 'normal')
+	public function send(string $phone, string $templateCode, $templateParam = null, ?string $type = 'normal')
 	{
     // 检查参数
     if(is_string($templateParam)){
       $type = $templateParam;
-      $templateParam = '{}';
+      $templateParam = null;
     }else{
-      $templateParam = json_encode($templateParam);
+      $templateParam = (array)$templateParam;
     }
     $client = $this->createClient();
     $request = $this->createRequest([
       "phoneNumbers" => $phone,
       "templateCode" => $templateCode,
-      "templateParam" => $templateParam
+      "templateParam" => $templateParam ? json_encode($templateParam) : null
     ]);
     $runtime = $this->createRuntime();
     try {
       // 复制代码运行请自行打印 API 的返回值
       $resp = $client->sendSmsWithOptions($request, $runtime);
       if($resp->body){
-        $this->model()->create([
-          'phone' => $phone,
-          'sign_name' => $this->config['sign_name'],
-          'template_code' => $templateCode,
-          'template_param' => $templateParam,
-          'type' => $type,
-          'code' => $resp->body->code,
-          'message' => $resp->body->message,
-          'biz_id' => $resp->body->bizId,
-          'request_id' => $resp->body->requestId
-        ]);
-        return (strcasecmp($resp->body->code , 'OK') === 0);
+        $result = ResultData::resp($resp->body);
+        $this->log($phone, $templateCode, $templateParam, $type,$result);
+        return $result;
       }
     }catch (Exception $error) {
-      throw $error;
       if (!($error instanceof TeaError)) {
         $error = new TeaError([], $error->getMessage(), $error->getCode(), $error);
       }
       Log::error($error->message);
+      return new ResultData('RUNTIME_ERROR','运行时错误，请查看日志');
     }
-    return false;
 	}
   /**
    * 发送验证码
@@ -146,11 +179,7 @@ class Aliyunsms extends AliyunsmsContract
    */
 	public function verification(string $phone , ?string $type = 'verification')
 	{
-    // 30秒内只能发一次验证码
-    if($this->model()->where('phone',$phone)->where('type',$type)->where('verified',0)->where('code','like','OK')->where('created_at','>',Carbon::parse('-30 seconds')->toDateTimeString())->exists()){
-      return -1;
-    }
-    $rand = sprintf("%'.06d\n", rand(1,999999));
+    $rand = sprintf("%'.06d", rand(1,999999));
     return $this->send($phone,$this->config['template_code'],['rand' => $rand],$type);
 	}
   /**
@@ -161,28 +190,24 @@ class Aliyunsms extends AliyunsmsContract
    * @param string $type 验证码类型
    * @param int $expires 验证码有效时间，默认为900秒
    * 
-   * @return int
-   *   1 验证码匹配
-   *   0 验证码不匹配
-   *   -1 没有找到对应的验证码
-   *   -2 验证码已经被验证过
-   *   -3 验证码已过期
+   * @return \Moocky\Aliyunsms\ResultData
    */
   public function verify(string $phone, string $rand, ?string $type = 'verification', ?int $expires = 900){
-    if($sms = $this->model()->where('phone',$phone)->where('type',$type)->where('code','like','OK')->latest()->first()){
+    if($sms = $this->info($phone,$type)){;
       // 已经被验证
       if($sms->verified){
-        return -2;
+        return new ResultData('SMS_VERIFIED','验证码已被验证');
       }
       if($sms->created_at->getTimestamp() + $expires < time() ){
-        return -3;
+        return new ResultData('SMS_EXPIRED', '验证码已过期');
       }
-      if($sms->templateParam && array_key_exists('code',$sms->templateParam) && $sms->templateParam['code'] === $code){
+      $name = $this->config['code_name'] ?? 'rand';
+      if($sms->template_param && array_key_exists($name,$sms->template_param) && $sms->template_param[$name] === $rand){
         $sms->update(['verified' => 1]);
-        return 1;
+        return new ResultData('OK', '验证通过');
       }
-      return 0;
+      return new ResultData('SMS_FAILED', '验证失败');
     }
-    return -1;
+    return new ResultData('SMS_EMPTY', '没有找到短信日志');
   }
 }
