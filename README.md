@@ -55,8 +55,8 @@ class IndexController extends Controller
     # $templateParam 短信参数
     # $type 短信类型，默认为normal
 
-    $aliyunsms->send('13042262923','SMS_112233445566',['rand' => 123456],'normal');
-    $aliyunsms->send('13042262923','SMS_556677889900');
+    $aliyunsms->send('13888888888','SMS_112233445566',['rand' => 123456],'normal');
+    $aliyunsms->send('13888888888','SMS_556677889900');
   }
   public function send()
   {
@@ -67,8 +67,8 @@ class IndexController extends Controller
     # $templateParam 短信参数
     # $type 短信类型，默认为normal
 
-    app('aliyunsms')->send('13042262923','SMS_112233445566',['rand' => 123456],'normal');
-    app('aliyunsms')->send('13042262923','SMS_556677889900');
+    app('aliyunsms')->send('13888888888','SMS_112233445566',['rand' => 123456],'normal');
+    app('aliyunsms')->send('13888888888','SMS_556677889900');
   }
   public function verification()
   {
@@ -76,8 +76,8 @@ class IndexController extends Controller
     #
     # $phone 手机号
     # $type 验证码类型，默认为verification
-    app('aliyunsms')->verification('13042262923','verification');
-    app('aliyunsms')->verification('13042262923');
+    app('aliyunsms')->verification('13888888888','verification');
+    app('aliyunsms')->verification('13888888888');
   }
   public function verify()
   {
@@ -87,8 +87,8 @@ class IndexController extends Controller
     # $rand 验证码
     # $type 验证码类型，默认为verification
     # $expires 验证码有效时间，默认为600秒
-    app('aliyunsms')->verify('13042262923','123456','verification',1200);
-    app('aliyunsms')->verify('13042262923','123456');
+    app('aliyunsms')->verify('13888888888','123456','verification',1200);
+    app('aliyunsms')->verify('13888888888','123456');
   }
 }
 ```
@@ -114,16 +114,16 @@ $config = [
 # $templateParam 短信参数
 # $type 短信类型，默认为normal
 $aliyunsms = new Aliyunsms($config);
-$aliyunsms->send('13042262923','SMS_112233445566',['rand' => 123456],'normal');
-$aliyunsms->send('13042262923','SMS_556677889900');
+$aliyunsms->send('13888888888','SMS_112233445566',['rand' => 123456],'normal');
+$aliyunsms->send('13888888888','SMS_556677889900');
 
 # 发送验证码
 #
 # $phone 手机号
 # $type 验证码类型，默认为verification
 $aliyunsms = new Aliyunsms($config);
-$aliyunsms->verification('13042262923','verification');
-$aliyunsms->verification('13042262923');
+$aliyunsms->verification('13888888888','verification');
+$aliyunsms->verification('13888888888');
 
 # 校验验证码
 #
@@ -132,6 +132,6 @@ $aliyunsms->verification('13042262923');
 # $type 验证码类型，默认为verification
 # $expires 验证码有效时间，默认为600秒
 $aliyunsms = new Aliyunsms($config);
-$aliyunsms->verify('13042262923','123456','verification',1200);
-$aliyunsms->verify('13042262923','123456');
+$aliyunsms->verify('13888888888','123456','verification',1200);
+$aliyunsms->verify('13888888888','123456');
 ```
