@@ -22,9 +22,9 @@ class LaravelServiceProvider extends ServiceProvider
 	public function boot()
 	{
 		// 发布配置文件到 laravel 的config 下
-		$path = realpath(__DIR__ . '/../../config/aliyunsms.php');
-    $this->publishes([ $path => config_path('aliyunsms.php')],'config');
-    $this->mergeConfigFrom($path, 'aliyunsms');
+		$path = realpath(__DIR__ . '/../../config/aliyun.php');
+    $this->publishes([ $path => config_path('aliyun.php')], 'config');
+    $this->mergeConfigFrom($path, 'aliyun');
 
     $this->commands([
       \Moocky\Aliyunsms\Console\TableCommand::class
@@ -35,11 +35,11 @@ class LaravelServiceProvider extends ServiceProvider
 	{
 		// 单例绑定服务
 		$this->app->singleton('aliyunsms', function ($app) {
-			return new Aliyunsms($app->config['aliyunsms']);
+			return new Aliyunsms($app->config['aliyun']);
 		});
     //使用bind绑定实例到接口以便依赖注入
     $this->app->bind(AliyunsmsContract::class,function($app){
-			return new Aliyunsms($app->config['aliyunsms']);
+			return new Aliyunsms($app->config['aliyun']);
     });
 	}
 

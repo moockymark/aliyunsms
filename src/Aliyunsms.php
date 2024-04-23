@@ -10,12 +10,13 @@ namespace Moocky\Aliyunsms;
 use \Exception;
 
 use Darabonba\OpenApi\Models\Config;
+use Carbon\Carbon;
 use AlibabaCloud\SDK\Dysmsapi\V20170525\Dysmsapi;
 use AlibabaCloud\SDK\Dysmsapi\V20170525\Models\SendSmsRequest;
 use AlibabaCloud\Tea\Exception\TeaError;
 use AlibabaCloud\Tea\Utils\Utils\RuntimeOptions;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Arr;
 
 use Moocky\Aliyunsms\Contracts\Aliyunsms as AliyunsmsContract;
 use Moocky\Aliyunsms\Models\SmsLog;
@@ -39,6 +40,10 @@ class Aliyunsms extends AliyunsmsContract
 	{
 		$this->config = $config;
 	}
+  public function config($name, $default = null)
+  {
+    return Arr::get($this->config, $name, $default);
+  }
   /**
    * 使用AK&SK初始化账号Client
    * @param string $accessKeyId
@@ -48,12 +53,12 @@ class Aliyunsms extends AliyunsmsContract
   private function createClient(){
     $config = new Config([
       // 必填，您的 AccessKey ID
-      "accessKeyId" => $this->config['access_key_id'],
+      'accessKeyId' => $this->config('access_key_id'),
       // 必填，您的 AccessKey Secret
-      "accessKeySecret" => $this->config['access_key_secret']
+      'accessKeySecret' => $this->config('access_key_secret')
     ]);
     // Endpoint 请参考 https://api.aliyun.com/product/Dysmsapi
-    $config->endpoint = $this->config['endpoint'];
+    $config->endpoint = $this->config('endpoint');
     return new Dysmsapi($config);
   }
   /**
@@ -63,7 +68,7 @@ class Aliyunsms extends AliyunsmsContract
    */
   private function createRequest(array $data){
     return new SendSmsRequest(array_merge([
-      "signName" => $this->config['sign_name']
+      "signName" => $this->config('dysms.sign_name')
     ],$data));
   }
   /**
@@ -83,11 +88,11 @@ class Aliyunsms extends AliyunsmsContract
    */
   private function model()
   {
-    if($this->config['sms_log_table']){
-      $model = new SmsLog;
-      $model->setTable($this->config['sms_log_table']);
-      return $model;
+    $model = new SmsLog;
+    if($this->config('dysms.sms_log_table')){
+      $model->setTable($this->config('dysms.sms_log_table'));
     }
+    return $model;
   }
   /**
    * 记录日志
@@ -99,19 +104,17 @@ class Aliyunsms extends AliyunsmsContract
    * @return Moocky\Aliyunsms\Models\SmsLog
    */
   private function log(string $phone, string $templateCode, ?array $templateParam = null, string $type, ResultData $result){
-    if($model = $this->model()){
-      return $model->create([
-        'sign_name' => $this->config['sign_name'],
-        'phone' => $phone,
-        'template_code' => $templateCode,
-        'template_param' => $templateParam,
-        'type' => $type,
-        'code' => $result->code,
-        'message' => $result->message,
-        'biz_id' => $result->bizId,
-        'request_id' => $result->requestId
-      ]);
-    }
+    return $this->model()->create([
+      'sign_name' => $this->config('dysms.sign_name'),
+      'phone' => $phone,
+      'template_code' => $templateCode,
+      'template_param' => $templateParam,
+      'type' => $type,
+      'code' => $result->code,
+      'message' => $result->message,
+      'biz_id' => $result->bizId,
+      'request_id' => $result->requestId
+    ]);
   }
   /**
    * 获取日志
@@ -180,7 +183,7 @@ class Aliyunsms extends AliyunsmsContract
 	public function verification(string $phone , ?string $type = 'verification')
 	{
     $rand = sprintf("%'.06d", rand(1,999999));
-    return $this->send($phone,$this->config['template_code'],['rand' => $rand],$type);
+    return $this->send($phone,$this->config('dysms.template_code'),[ $this->config('dysms.code_name') => $rand],$type);
 	}
   /**
    * 检查验证码
@@ -193,17 +196,17 @@ class Aliyunsms extends AliyunsmsContract
    * @return \Moocky\Aliyunsms\ResultData
    */
   public function verify(string $phone, string $rand, ?string $type = 'verification', ?int $expires = 900){
-    if($sms = $this->info($phone,$type)){;
+    if($sms = $this->info($phone, $type)){
       // 已经被验证
-      if($sms->verified){
+      if($sms->verified_at){
         return new ResultData('SMS_VERIFIED','验证码已被验证');
       }
       if($sms->created_at->getTimestamp() + $expires < time() ){
         return new ResultData('SMS_EXPIRED', '验证码已过期');
       }
-      $name = $this->config['code_name'] ?? 'rand';
-      if($sms->template_param && array_key_exists($name,$sms->template_param) && $sms->template_param[$name] === $rand){
-        $sms->update(['verified' => 1]);
+      $name = $this->config('dysms.code_name', 'rand');
+      if($rand && Arr::get($sms->template_param, $name) === $rand){
+        //$sms->update(['verified_at' => Carbon::now()->toDateTimeString()]);
         return new ResultData('OK', '验证通过');
       }
       return new ResultData('SMS_FAILED', '验证失败');

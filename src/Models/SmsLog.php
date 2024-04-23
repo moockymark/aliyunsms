@@ -23,12 +23,13 @@ class SmsLog extends Model
   * @var array
   */
   protected $casts = [
-    'template_param'   => 'array'
+    'template_param' => 'array',
+    'verified_at'    => 'datetime'
   ];
   /**
    * The attributes that are mass assignable.
    *
    * @var array
    */
-  protected $fillable = ['id','phone','sign_name','template_code','template_param','type','verified','code','biz_id','request_id'];
+  protected $fillable = ['id','phone','sign_name','template_code','template_param','type','verified_at','code','biz_id','request_id'];
 }
