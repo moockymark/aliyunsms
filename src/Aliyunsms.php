@@ -68,8 +68,8 @@ class Aliyunsms extends AliyunsmsContract
    */
   private function createRequest(array $data){
     return new SendSmsRequest(array_merge([
-      "signName" => $this->config('dysms.sign_name')
-    ],$data));
+      'signName' => $this->config('dysms.sign_name')
+    ], $data));
   }
   /**
    * 创建运行时配置
@@ -78,9 +78,9 @@ class Aliyunsms extends AliyunsmsContract
    */
   private function createRuntime(?array $options = []){
     return new RuntimeOptions(array_merge([
-      "connectTimeout" => 10000,
-      "ignoreSSL" => true
-    ],$options));
+      'connectTimeout' => 10000,
+      'ignoreSSL' => true
+    ], $options));
   }
   /**
    * 获取Model
@@ -122,7 +122,8 @@ class Aliyunsms extends AliyunsmsContract
    * @param string $type 短信类型
    * @return Moocky\Aliyunsms\Models\SmsLog
    */
-  private function info(string $phone,?string $type = 'normal'){
+  private function info(string $phone,?string $type = 'normal')
+	{
     if($model = $this->model()){
       return $model->where('phone',$phone)->where('type',$type)->where('code','like','OK')->latest()->first();
     }
@@ -180,10 +181,10 @@ class Aliyunsms extends AliyunsmsContract
    *   false 发送失败
    *   -1 30秒内已经有验证码
    */
-	public function verification(string $phone , ?string $type = 'verification')
+	public function verification(string $phone, ?string $type = 'verification')
 	{
     $rand = sprintf("%'.06d", rand(1,999999));
-    return $this->send($phone,$this->config('dysms.template_code'),[ $this->config('dysms.code_name') => $rand],$type);
+    return $this->send($phone,$this->config('dysms.template_code'), [ $this->config('dysms.code_name') => $rand ], $type);
 	}
   /**
    * 检查验证码
