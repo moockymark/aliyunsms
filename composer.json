@@ -3,6 +3,7 @@
 	"description": "基于alibabacloud/dysmsapi-20170525 接入短信服务",
   "keywords": ["php", "laravel", "lumen", "sms", "aliyunsms", "dysmsapi", "alibabacloud"],
 	"type": "library",
+	"license": "MIT",
 	"require": {
 		"php": ">7.2",
 		"alibabacloud/dysmsapi-20170525": "^3.0"
