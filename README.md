@@ -9,11 +9,11 @@ composer require moocky/aliyunsms
 # 基于laravel框架的使用方法
 
 ## 加载
-在config/app的providers中添加 Moocky\Aliyunsms\LaravelServiceProvider::class
+在config/app的providers中添加 Moocky\Aliyunsms\Providers\LaravelServiceProvider::class
 
 ## 控制台运行
 ```BASH
-php artisan vendor:publish --provider=Moocky\Aliyunsms\LaravelServiceProvider
+php artisan vendor:publish --provider=Moocky\Aliyunsms\Providers\LaravelServiceProvider
 ```
 
 ## 配置
