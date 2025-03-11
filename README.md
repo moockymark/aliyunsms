@@ -3,7 +3,7 @@
 
 # 安装
 ```BASH
-composer require moocky/aliyunsms dev-master
+composer require moocky/aliyunsms
 ```
 
 # 基于laravel框架的使用方法

@@ -18,6 +18,13 @@
 			"email": "moocky@moocky.net"
 		}
 	],
+	"extra": {
+		"laravel": {
+			"providers": [
+				"Moocky\Aliyunsms\LaravelServiceProvider::class"
+			]
+		}
+	},
 	"prefer-stable": true,
 	"minimum-stability": "stable"
 }
