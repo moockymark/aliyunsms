@@ -21,7 +21,7 @@
 	"extra": {
 		"laravel": {
 			"providers": [
-				"Moocky\Aliyunsms\LaravelServiceProvider"
+				"Moocky\Aliyunsms\Providers\LaravelServiceProvider"
 			]
 		}
 	},
